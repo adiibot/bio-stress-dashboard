@@ -23,6 +23,8 @@ import {
   type Tier,
   type Trajectory,
 } from "@/lib/types";
+import { AgreementMatrix } from "./AgreementMatrix";
+import { ClusterEmbedding } from "./ClusterEmbedding";
 
 const TIER_BANDS = [
   { y1: 0, y2: 16, color: "#10b981" },
@@ -267,8 +269,58 @@ export function CohortMain({ cohort }: { cohort: CohortAggregate }) {
         </Block>
       </div>
 
+      <AgreementMatrix agreement={cohort.agreement} />
+
+      <ClusterEmbedding embedding={cohort.embedding} />
+
+      <section className="rise rise-5 mt-10">
+        <div className="text-[10px] uppercase tracking-[0.2em] text-ink-500 mb-2">
+          Pattern recognition
+        </div>
+        <h2 className="serif text-2xl text-ink-900 leading-tight mb-1">
+          Beyond the linear composite.
+        </h2>
+        <p className="text-ink-500 text-sm mb-5 max-w-2xl">
+          Multi-marker constellations the score itself doesn&apos;t capture as a single penalty.
+          Detected per latest visit; informational only — they never alter the score or tier.
+        </p>
+        <div className="rounded-2xl bg-white border border-ink-100 p-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+            {Object.entries(cohort.pattern_prevalence ?? {})
+              .slice(0, 15)
+              .map(([id, count]) => {
+                const pct = (count / cohort.total_patients) * 100;
+                const isPositive = id.includes("HEALTHY") || id.includes("REACTIVE_BUFFER");
+                const isNeutral = id.includes("CEILING") || id.includes("NOCTURNAL")
+                  || id.includes("CATABOLIC_DOMINANT") || id.includes("COMT_SHUNT");
+                const color = isPositive ? "#10b981" : isNeutral ? "#f59e0b" : "#e11d48";
+                return (
+                  <div key={id} className="flex items-center gap-3 py-1">
+                    <span
+                      className="w-1.5 h-1.5 rounded-full shrink-0"
+                      style={{ background: color }}
+                    />
+                    <span className="text-xs text-ink-800 font-medium flex-1 min-w-0 truncate">
+                      {id}
+                    </span>
+                    <div className="w-20 h-1 bg-ink-100 rounded-full overflow-hidden shrink-0">
+                      <div
+                        className="h-full rounded-full"
+                        style={{ width: `${Math.min(100, pct * 3)}%`, background: color }}
+                      />
+                    </div>
+                    <span className="num text-xs text-ink-500 shrink-0 w-16 text-right">
+                      {count.toLocaleString()} · {pct.toFixed(1)}%
+                    </span>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      </section>
+
       {/* Rules + trajectory + age */}
-      <div className="rise rise-5 mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="rise rise-6 mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Block eyebrow="Trajectory" title="Direction tags.">
           <div className="rounded-2xl bg-white border border-ink-100 p-5 space-y-4">
             {Object.entries(cohort.trajectory_counts).map(([t, c]) => {

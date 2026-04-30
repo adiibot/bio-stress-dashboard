@@ -6,12 +6,16 @@ import { BiomarkerRow } from "@/components/BiomarkerRow";
 import { CortisolCurve } from "@/components/CortisolCurve";
 import { TrajectoryChart } from "@/components/TrajectoryChart";
 import { DeepDiveHero } from "@/components/clinician/DeepDiveHero";
+import { ClusterEmbedding } from "@/components/clinician/ClusterEmbedding";
+import { NeighborsPanel } from "@/components/clinician/NeighborsPanel";
+import { PatternsPanel } from "@/components/clinician/PatternsPanel";
 import { BASE_PATH } from "@/lib/base-path";
 import {
   PHASE_LABEL,
   PHENOTYPE_COLOR,
   PHENOTYPE_DESCRIPTION,
   type BiomarkerKey,
+  type CohortAggregate,
   type PatientRecord,
   type Phenotype,
 } from "@/lib/types";
@@ -67,25 +71,33 @@ function Loader() {
   const sp = useSearchParams();
   const id = sp.get("id");
   const [p, setP] = useState<PatientRecord | null>(null);
+  const [cohort, setCohort] = useState<CohortAggregate | null>(null);
   const [missing, setMissing] = useState(false);
 
   useEffect(() => {
     setP(null);
     setMissing(false);
     if (!id) return;
-    fetch(`${BASE_PATH}/data/patients/${id}.json`)
-      .then((r) => {
-        if (!r.ok) { setMissing(true); return null; }
-        return r.json() as Promise<PatientRecord>;
+    Promise.all([
+      fetch(`${BASE_PATH}/data/patients/${id}.json`).then((r) =>
+        r.ok ? (r.json() as Promise<PatientRecord>) : null,
+      ),
+      fetch(`${BASE_PATH}/data/cohort.json`).then((r) =>
+        r.ok ? (r.json() as Promise<CohortAggregate>) : null,
+      ),
+    ])
+      .then(([patient, c]) => {
+        if (!patient) { setMissing(true); return; }
+        setP(patient);
+        if (c) setCohort(c);
       })
-      .then((d) => { if (d) setP(d); })
       .catch(() => setMissing(true));
   }, [id]);
 
   if (!id) return <Centered>No patient ID provided.</Centered>;
   if (missing) return <Centered>Patient {id} not found.</Centered>;
-  if (!p) return <Centered>Loading…</Centered>;
-  return <ClinicianDeepDive p={p} />;
+  if (!p || !cohort) return <Centered>Loading…</Centered>;
+  return <ClinicianDeepDive p={p} cohort={cohort} />;
 }
 
 function Centered({ children }: { children: React.ReactNode }) {
@@ -97,7 +109,7 @@ function Centered({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ClinicianDeepDive({ p }: { p: PatientRecord }) {
+function ClinicianDeepDive({ p, cohort }: { p: PatientRecord; cohort: CohortAggregate }) {
   const visit = p.latest_visit;
   const r = visit.result;
   const m = visit.biomarkers;
@@ -260,6 +272,16 @@ function ClinicianDeepDive({ p }: { p: PatientRecord }) {
           </div>
         </div>
       </div>
+
+      <div className="rise rise-4 grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-5 mt-5">
+        <PatternsPanel patterns={p.patterns} />
+        <NeighborsPanel neighbors={p.neighbors} />
+      </div>
+
+      <ClusterEmbedding
+        embedding={cohort.embedding}
+        highlight={{ x: p.embedding.x, y: p.embedding.y, id: p.id }}
+      />
 
       {(r.rule_details.length > 0 || r.flag_details.length > 0) && (
         <section className="rise rise-4 mt-5 rounded-2xl bg-white border border-ink-100 p-5">

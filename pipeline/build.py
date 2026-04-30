@@ -27,6 +27,7 @@ import numpy as np
 import pandas as pd
 
 from score_engine import bio_stress_score, result_to_dict, NR
+from pattern_engine import detect_patterns
 
 
 REPO = Path(__file__).resolve().parent.parent
@@ -133,6 +134,40 @@ def score_visit(row):
         return None, biomarkers, False
     r = bio_stress_score(creatinine_ur=biomarkers.get("creatinine"), **args)
     return result_to_dict(r), biomarkers, True
+
+
+def _build_embedding_sample(coords, records, n=3000):
+    """Stratified down-sample of the cohort to keep the cluster viz responsive."""
+    import random
+    rng = random.Random(42)
+    total = len(records)
+    if total <= n:
+        idx = list(range(total))
+    else:
+        # stratify by phenotype to keep the colour distribution honest
+        by_pheno: dict[str, list[int]] = {}
+        for i, p in enumerate(records):
+            by_pheno.setdefault(p["phenotype_baseline"] or "?", []).append(i)
+        idx: list[int] = []
+        for pheno, lst in by_pheno.items():
+            quota = max(50, round(n * len(lst) / total))
+            idx.extend(rng.sample(lst, min(quota, len(lst))))
+        rng.shuffle(idx)
+        idx = idx[:n]
+    out = []
+    for i in idx:
+        rec = records[i]
+        latest = rec["visits"][rec["latest_visit_idx"]]
+        out.append({
+            "id": rec["id"],
+            "x": round(float(coords[i, 0]), 3),
+            "y": round(float(coords[i, 1]), 3),
+            "phenotype": rec["phenotype_baseline"],
+            "tier": latest["result"]["tier_final"],
+            "trajectory": rec["trajectory"],
+            "score": latest["result"]["score_formula"],
+        })
+    return out
 
 
 def main():
@@ -394,9 +429,127 @@ def main():
     (OUT / "patients-index.json").write_text(json.dumps(index, separators=(",", ":")))
     print(f"  patients-index.json — {(OUT / 'patients-index.json').stat().st_size // 1024} KB")
 
+    # ---- Pattern recognition (latest visit per patient) ----
+    print("detecting patterns...")
+    pattern_prev = Counter()
+    pattern_lists: list[list[dict]] = []
+    for p in patient_records:
+        latest = p["visits"][p["latest_visit_idx"]]
+        patterns = detect_patterns(latest["biomarkers"], latest["result"])
+        pattern_lists.append(patterns)
+        for pat in patterns:
+            pattern_prev[pat["id"]] += 1
+    print(f"  {sum(len(pl) for pl in pattern_lists):,} pattern hits across {len(patient_records):,} patients")
+
+    # ---- Engine vs ground-truth agreement ----
+    print("computing engine vs ground-truth agreement...")
+    # expected tier per phenotype (numeric 1..4 + range tolerance)
+    EXPECTED_TIER = {
+        "Healthy": 1,
+        "AcuteStress": 2,
+        "EarlyBurnout": 2,
+        "Burnout": 3,
+        "Exhaustion": 4,
+        "AdrenalFatigue": 4,
+        "SympatheticDominance": 2,
+    }
+    TIER_NUM = {"T1": 1, "T2": 2, "T3": 3, "T4": 4}
+    agreement_matrix: dict[str, dict[str, int]] = {p: {"T1": 0, "T2": 0, "T3": 0, "T4": 0} for p in EXPECTED_TIER}
+    strict_match = 0
+    within_one = 0
+    total_with_pheno = 0
+    stable_strict_match = 0
+    stable_total = 0
+    for p in patient_records:
+        pheno = p["phenotype_baseline"]
+        if not pheno or pheno not in EXPECTED_TIER:
+            continue
+        latest = p["visits"][p["latest_visit_idx"]]
+        engine_tier = latest["result"]["tier_final"]
+        agreement_matrix[pheno][engine_tier] += 1
+        diff = abs(TIER_NUM[engine_tier] - EXPECTED_TIER[pheno])
+        total_with_pheno += 1
+        if diff == 0:
+            strict_match += 1
+        if diff <= 1:
+            within_one += 1
+        if p["trajectory"] == "stable":
+            stable_total += 1
+            if diff == 0:
+                stable_strict_match += 1
+
+    # ---- 2D PCA embedding for the cohort ----
+    print("computing 2D embedding (PCA on biomarker z-scores)...")
+    # We'll compute Xn (z-scored) below in the neighbors step — do it here too to share
+    feature_keys_for_emb = [
+        "m1", "m2", "m3", "m4", "m5",
+        "car_pct", "aucg", "dcs",
+        "dhea", "cor_dhea",
+        "da", "dopac", "hva", "nor", "epi", "vma", "mhpg",
+        "ser", "hiaa", "hiaa_ser", "da_ser",
+    ]
+    feat = []
+    for p in patient_records:
+        latest = p["visits"][p["latest_visit_idx"]]
+        feat.append([
+            (latest["biomarkers"].get(k) if latest["biomarkers"].get(k) is not None else np.nan)
+            for k in feature_keys_for_emb
+        ])
+    Xemb = np.array(feat, dtype=np.float64)
+    col_med = np.nanmedian(Xemb, axis=0)
+    nan_mask_e = np.isnan(Xemb)
+    Xemb[nan_mask_e] = np.take(col_med, np.where(nan_mask_e)[1])
+    mu_e = Xemb.mean(axis=0)
+    sigma_e = Xemb.std(axis=0)
+    sigma_e[sigma_e == 0] = 1.0
+    Xz = (Xemb - mu_e) / sigma_e
+    # PCA via SVD
+    Xc = Xz - Xz.mean(axis=0)
+    _U, _S, Vt = np.linalg.svd(Xc, full_matrices=False)
+    coords = Xc @ Vt[:2].T  # (N, 2)
+    # explained variance
+    var_total = (Xc ** 2).sum() / (len(Xc) - 1)
+    pc1_var = (_S[0] ** 2) / (len(Xc) - 1)
+    pc2_var = (_S[1] ** 2) / (len(Xc) - 1)
+    pc1_pct = pc1_var / var_total * 100
+    pc2_pct = pc2_var / var_total * 100
+    print(f"  PC1 {pc1_pct:.1f}% · PC2 {pc2_pct:.1f}% explained variance")
+
+    # ---- Nearest neighbors via cosine similarity in z-score biomarker space ----
+    print("computing nearest neighbors...")
+    # Reuse the z-scored matrix computed for embedding
+    Xn = Xz
+    norms = np.linalg.norm(Xn, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+    Xu = Xn / norms
+
+    K = 5
+    N = len(patient_records)
+    neighbor_idx = np.zeros((N, K), dtype=np.int64)
+    neighbor_sim = np.zeros((N, K), dtype=np.float64)
+    BATCH = 256
+    for i in range(0, N, BATCH):
+        end = min(i + BATCH, N)
+        sim = Xu[i:end] @ Xu.T  # (batch, N)
+        # mask self
+        for j in range(end - i):
+            sim[j, i + j] = -np.inf
+        # take top K
+        idx = np.argpartition(-sim, K, axis=1)[:, :K]
+        # sort within those K
+        for j in range(end - i):
+            picks = idx[j]
+            sims = sim[j, picks]
+            order = np.argsort(-sims)
+            neighbor_idx[i + j] = picks[order]
+            neighbor_sim[i + j] = sims[order]
+        if (i // BATCH) % 10 == 0:
+            print(f"  neighbors {end}/{N}")
+    print(f"  neighbors computed for {N:,} patients")
+
     # write per-patient files (with percentile attached for latest visit)
     print("writing per-patient files...")
-    for p in patient_records:
+    for pi, p in enumerate(patient_records):
         latest = p["visits"][p["latest_visit_idx"]]
         percentiles = {}
         for k in BIOMARKER_KEYS:
@@ -404,6 +557,26 @@ def main():
             if v is not None and raw_arrays[k]:
                 percentiles[k] = percentile_rank(raw_arrays[k], v)
         score_pct = percentile_rank(score_sorted, latest["result"]["score_formula"])
+
+        # nearest neighbors
+        neighbors = []
+        for k in range(K):
+            j = int(neighbor_idx[pi, k])
+            if j < 0 or j >= N:
+                continue
+            np_rec = patient_records[j]
+            np_latest = np_rec["visits"][np_rec["latest_visit_idx"]]
+            np_result = np_latest["result"]
+            neighbors.append({
+                "id": np_rec["id"],
+                "similarity": round(float(neighbor_sim[pi, k]), 4),
+                "score": np_result["score_formula"],
+                "tier": np_result["tier_final"],
+                "phenotype": np_rec.get("phenotype_baseline"),
+                "trajectory": np_rec.get("trajectory"),
+                "sex": np_rec.get("sex"),
+                "age": np_rec.get("age"),
+            })
 
         # trajectory: score over time, only valid visits
         trajectory = [
@@ -447,6 +620,17 @@ def main():
             "trajectory_data": trajectory,
             "percentiles": percentiles,
             "score_percentile": score_pct,
+            "patterns": pattern_lists[pi],
+            "neighbors": neighbors,
+            "embedding": {
+                "x": round(float(coords[pi, 0]), 4),
+                "y": round(float(coords[pi, 1]), 4),
+            },
+            "expected_tier": (
+                f"T{EXPECTED_TIER[p['phenotype_baseline']]}"
+                if p["phenotype_baseline"] in EXPECTED_TIER
+                else None
+            ),
         }
         (PATIENTS_DIR / f"{p['id']}.json").write_text(json.dumps(record, separators=(",", ":")))
     print(f"  {len(patient_records):,} patient files in {PATIENTS_DIR}")
@@ -466,6 +650,22 @@ def main():
         "rule_co_occurrence": dict(rule_pairs.most_common(30)),
         "biomarker_summary": biomarker_summary,
         "phase_counts": dict(sorted(phase_counts.items())),
+        "pattern_prevalence": dict(pattern_prev.most_common()),
+        "agreement": {
+            "expected_tier": EXPECTED_TIER,
+            "matrix": agreement_matrix,
+            "strict_match": strict_match,
+            "within_one": within_one,
+            "total_with_pheno": total_with_pheno,
+            "stable_strict_match": stable_strict_match,
+            "stable_total": stable_total,
+        },
+        "embedding": {
+            "pc1_pct": round(float(pc1_pct), 1),
+            "pc2_pct": round(float(pc2_pct), 1),
+            # downsampled scatter — at most 3000 dots for the cohort viz
+            "sample": _build_embedding_sample(coords, patient_records, n=3000),
+        },
         "phenotype_counts": dict(phenotype_counts.most_common()),
         "trajectory_counts": dict(trajectory_counts.most_common()),
         "phenotype_x_tier": {k: dict(v) for k, v in phenotype_x_tier.items()},

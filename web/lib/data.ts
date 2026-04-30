@@ -26,6 +26,11 @@ export async function getIndex(): Promise<PatientIndexEntry[]> {
   return _index!;
 }
 
+export async function getEmbeddingSample() {
+  const c = await getCohort();
+  return c.embedding;
+}
+
 export async function getPatient(id: string): Promise<PatientRecord | null> {
   try {
     const raw = await fs.readFile(path.join(ROOT, "patients", `${id}.json`), "utf-8");

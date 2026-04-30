@@ -10,6 +10,7 @@ import { AxisStory } from "@/components/narrative/AxisStory";
 import { DayRhythm } from "@/components/narrative/DayRhythm";
 import { InsightStream } from "@/components/narrative/InsightStream";
 import { NextStep } from "@/components/narrative/NextStep";
+import { PatternsCallout } from "@/components/narrative/PatternsCallout";
 import { BASE_PATH } from "@/lib/base-path";
 import type { PatientRecord } from "@/lib/types";
 
@@ -116,6 +117,24 @@ function PatientDeepDive({ p }: { p: PatientRecord }) {
       >
         <InsightStream insights={r.insights} />
       </Section>
+
+      {p.patterns.length > 0 && (
+        <Section
+          eyebrow="Pattern recognition"
+          title={
+            p.patterns.length === 1
+              ? "One bigger pattern in your panel."
+              : `${p.patterns.length} bigger patterns in your panel.`
+          }
+          delayClass="rise-5"
+        >
+          <p className="text-ink-700 text-base leading-relaxed max-w-xl mb-5">
+            Beyond the individual signals above, these are constellations across multiple
+            markers — recognised pictures of how stress biology behaves.
+          </p>
+          <PatternsCallout patterns={p.patterns} />
+        </Section>
+      )}
 
       <Section
         eyebrow="What's next"

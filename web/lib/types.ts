@@ -96,6 +96,31 @@ export interface LatestVisit {
   result: ScoreResult;
 }
 
+export interface Pattern {
+  id: string;
+  name: string;
+  tone: "positive" | "neutral" | "warning";
+  summary: string;
+  evidence: string[];
+  rationale?: string;
+}
+
+export interface Neighbor {
+  id: string;
+  similarity: number;
+  score: number;
+  tier: Tier;
+  phenotype: Phenotype | null;
+  trajectory: Trajectory | null;
+  sex: Sex;
+  age: number | null;
+}
+
+export interface Embedding {
+  x: number;
+  y: number;
+}
+
 export interface PatientRecord {
   id: string;
   lab_id: string | null;
@@ -114,6 +139,10 @@ export interface PatientRecord {
   trajectory_data: VisitPoint[];
   percentiles: Partial<Record<BiomarkerKey, number>>;
   score_percentile: number | null;
+  patterns: Pattern[];
+  neighbors: Neighbor[];
+  embedding: Embedding;
+  expected_tier: Tier | null;
 }
 
 export interface PatientIndexEntry {
@@ -173,6 +202,29 @@ export interface CohortAggregate {
   phenotype_x_tier: Record<string, Record<Tier, number>>;
   trajectory_x_tier: Record<string, Record<Tier, number>>;
   trajectory_curves: Record<string, { month: number; score: number; n: number }[]>;
+  pattern_prevalence: Record<string, number>;
+  agreement: {
+    expected_tier: Record<string, number>;
+    matrix: Record<string, Record<Tier, number>>;
+    strict_match: number;
+    within_one: number;
+    total_with_pheno: number;
+    stable_strict_match: number;
+    stable_total: number;
+  };
+  embedding: {
+    pc1_pct: number;
+    pc2_pct: number;
+    sample: {
+      id: string;
+      x: number;
+      y: number;
+      phenotype: Phenotype | null;
+      tier: Tier;
+      trajectory: Trajectory | null;
+      score: number;
+    }[];
+  };
   score_stats: { mean: number; median: number; p25: number; p75: number };
   age_stats: { mean: number; median: number; min: number; max: number } | null;
 }
