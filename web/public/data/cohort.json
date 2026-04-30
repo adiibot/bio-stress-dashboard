@@ -1,0 +1,803 @@
+{
+  "total_patients": 10000,
+  "total_visits": 109484,
+  "scored_visits": 76712,
+  "invalid_visits": 32772,
+  "tier_counts": {
+    "T2": 1024,
+    "T1": 6083,
+    "T3": 2126,
+    "T4": 767
+  },
+  "sex_counts": {
+    "F": 5960,
+    "M": 4040
+  },
+  "tier_x_sex": {
+    "T2": {
+      "F": 569,
+      "M": 455
+    },
+    "T1": {
+      "M": 2374,
+      "F": 3709
+    },
+    "T3": {
+      "M": 881,
+      "F": 1245
+    },
+    "T4": {
+      "F": 437,
+      "M": 330
+    }
+  },
+  "tier_x_age": {
+    "T2": {
+      "50-59": 229,
+      "30-39": 251,
+      "<30": 108,
+      "40-49": 388,
+      "60+": 48
+    },
+    "T1": {
+      "40-49": 2189,
+      "30-39": 1914,
+      "<30": 763,
+      "50-59": 1024,
+      "60+": 193
+    },
+    "T3": {
+      "30-39": 645,
+      "40-49": 790,
+      "<30": 257,
+      "50-59": 351,
+      "60+": 83
+    },
+    "T4": {
+      "30-39": 232,
+      "40-49": 273,
+      "<30": 97,
+      "50-59": 136,
+      "60+": 29
+    }
+  },
+  "score_histogram": {
+    "0": 3017,
+    "5": 2320,
+    "10": 1988,
+    "15": 1258,
+    "20": 488,
+    "25": 202,
+    "30": 128,
+    "35": 107,
+    "40": 92,
+    "45": 100,
+    "50": 85,
+    "55": 91,
+    "60": 86,
+    "65": 36,
+    "70": 2
+  },
+  "rule_prevalence": {
+    "DISPLAY-1": 2053,
+    "HPA_SAT_SAM_OVERFLOW": 1945,
+    "EXHAUSTION_COMPLETE": 456,
+    "CAR-1": 371,
+    "HYPO_FUNC": 306,
+    "DOPAC-1": 245,
+    "CAR-2": 174,
+    "CIR-1": 140,
+    "PRECLINICAL_BURNOUT": 6
+  },
+  "flag_prevalence": {
+    "NOCTURNAL_HYPERCORTISOLISM_ISOLATED": 262,
+    "DA_CATABOLIC_DOMINANT": 182
+  },
+  "rule_co_occurrence": {
+    "DISPLAY-1|HPA_SAT_SAM_OVERFLOW": 1925,
+    "CAR-1|EXHAUSTION_COMPLETE": 221,
+    "CAR-1|CAR-2": 174,
+    "CAR-2|EXHAUSTION_COMPLETE": 156,
+    "DOPAC-1|EXHAUSTION_COMPLETE": 146,
+    "CAR-1|DOPAC-1": 136,
+    "CAR-1|HYPO_FUNC": 116,
+    "DISPLAY-1|EXHAUSTION_COMPLETE": 95,
+    "DOPAC-1|HYPO_FUNC": 76,
+    "CAR-2|DOPAC-1": 72,
+    "CIR-1|DISPLAY-1": 44,
+    "CIR-1|HYPO_FUNC": 23,
+    "CIR-1|EXHAUSTION_COMPLETE": 16,
+    "CAR-2|HYPO_FUNC": 13,
+    "CAR-1|DISPLAY-1": 11,
+    "DISPLAY-1|PRECLINICAL_BURNOUT": 6,
+    "CAR-1|CIR-1": 5,
+    "CIR-1|HPA_SAT_SAM_OVERFLOW": 5,
+    "CIR-1|DOPAC-1": 4,
+    "CAR-2|DISPLAY-1": 4,
+    "HPA_SAT_SAM_OVERFLOW|PRECLINICAL_BURNOUT": 4
+  },
+  "biomarker_summary": {
+    "m1": {
+      "count": 10000,
+      "min": 1.0,
+      "max": 35.0,
+      "mean": 12.902,
+      "median": 12.68,
+      "p5": 3.12,
+      "p25": 9.252,
+      "p75": 16.3,
+      "p95": 23.117,
+      "lrl": 5.0,
+      "url": 17.1,
+      "below_lrl": 930,
+      "above_url": 2114,
+      "in_range": 6956
+    },
+    "m2": {
+      "count": 10000,
+      "min": 0.5,
+      "max": 50.0,
+      "mean": 21.507,
+      "median": 20.518,
+      "p5": 2.604,
+      "p25": 13.409,
+      "p75": 27.944,
+      "p95": 50.0,
+      "lrl": 7.5,
+      "url": 25.6,
+      "below_lrl": 1313,
+      "above_url": 3148,
+      "in_range": 5539
+    },
+    "m3": {
+      "count": 10000,
+      "min": 0.3,
+      "max": 9.881,
+      "mean": 3.947,
+      "median": 3.902,
+      "p5": 1.383,
+      "p25": 3.028,
+      "p75": 4.842,
+      "p95": 6.422,
+      "lrl": 1.9,
+      "url": 5.2,
+      "below_lrl": 840,
+      "above_url": 1854,
+      "in_range": 7306
+    },
+    "m4": {
+      "count": 10000,
+      "min": 0.1,
+      "max": 7.2172,
+      "mean": 2.209,
+      "median": 2.021,
+      "p5": 0.767,
+      "p25": 1.426,
+      "p75": 2.889,
+      "p95": 4.162,
+      "lrl": 0.3,
+      "url": 3.0,
+      "below_lrl": 47,
+      "above_url": 2253,
+      "in_range": 7700
+    },
+    "m5": {
+      "count": 10000,
+      "min": 0.1,
+      "max": 3.8149,
+      "mean": 1.169,
+      "median": 1.011,
+      "p5": 0.448,
+      "p25": 0.729,
+      "p75": 1.513,
+      "p95": 2.316,
+      "lrl": 0.3,
+      "url": 1.4,
+      "below_lrl": 130,
+      "above_url": 2923,
+      "in_range": 6947
+    },
+    "car_pct": {
+      "count": 10000,
+      "min": -85.6985,
+      "max": 284.3291,
+      "mean": 57.105,
+      "median": 59.064,
+      "p5": -12.321,
+      "p25": 28.523,
+      "p75": 83.699,
+      "p95": 125.822,
+      "lrl": 50,
+      "url": 120,
+      "below_lrl": 4111,
+      "above_url": 629,
+      "in_range": 5260
+    },
+    "aucg": {
+      "count": 10000,
+      "min": 6.9948,
+      "max": 198.9929,
+      "mean": 91.096,
+      "median": 88.727,
+      "p5": 23.136,
+      "p25": 70.128,
+      "p75": 111.231,
+      "p95": 167.972,
+      "lrl": 32,
+      "url": 113,
+      "below_lrl": 741,
+      "above_url": 2354,
+      "in_range": 6905
+    },
+    "dcs": {
+      "count": 10000,
+      "min": -2.0949,
+      "max": 0.0199,
+      "mean": -0.728,
+      "median": -0.723,
+      "p5": -1.335,
+      "p25": -0.94,
+      "p75": -0.507,
+      "p95": -0.135,
+      "lrl": -1.12,
+      "url": -0.24,
+      "below_lrl": 1219,
+      "above_url": 969,
+      "in_range": 7812
+    },
+    "dhea": {
+      "count": 10000,
+      "min": 0.05,
+      "max": 3.5614,
+      "mean": 1.054,
+      "median": 1.058,
+      "p5": 0.207,
+      "p25": 0.679,
+      "p75": 1.387,
+      "p95": 1.917,
+      "lrl": 0.53,
+      "url": 2.44,
+      "below_lrl": 1821,
+      "above_url": 113,
+      "in_range": 8066
+    },
+    "cor_dhea": {
+      "count": 10000,
+      "min": 1.2651,
+      "max": 49.75,
+      "mean": 14.452,
+      "median": 12.221,
+      "p5": 6.064,
+      "p25": 9.093,
+      "p75": 17.313,
+      "p95": 30.384,
+      "lrl": 5,
+      "url": 6,
+      "below_lrl": 186,
+      "above_url": 9527,
+      "in_range": 287
+    },
+    "da": {
+      "count": 10000,
+      "min": 15.0,
+      "max": 355.3729,
+      "mean": 159.226,
+      "median": 163.067,
+      "p5": 69.726,
+      "p25": 128.448,
+      "p75": 192.179,
+      "p95": 237.155,
+      "lrl": 108,
+      "url": 244,
+      "below_lrl": 1629,
+      "above_url": 386,
+      "in_range": 7985
+    },
+    "dopac": {
+      "count": 10000,
+      "min": 0.1,
+      "max": 6.2725,
+      "mean": 2.034,
+      "median": 1.99,
+      "p5": 0.798,
+      "p25": 1.553,
+      "p75": 2.46,
+      "p95": 3.394,
+      "lrl": 0.7,
+      "url": 4.0,
+      "below_lrl": 331,
+      "above_url": 193,
+      "in_range": 9476
+    },
+    "hva": {
+      "count": 10000,
+      "min": 0.4,
+      "max": 6.2761,
+      "mean": 2.377,
+      "median": 2.351,
+      "p5": 1.156,
+      "p25": 1.901,
+      "p75": 2.809,
+      "p95": 3.668,
+      "lrl": 1.44,
+      "url": 3.17,
+      "below_lrl": 997,
+      "above_url": 1304,
+      "in_range": 7699
+    },
+    "nor": {
+      "count": 10000,
+      "min": 3.0,
+      "max": 80.0,
+      "mean": 24.24,
+      "median": 22.619,
+      "p5": 9.218,
+      "p25": 17.36,
+      "p75": 29.83,
+      "p95": 43.273,
+      "lrl": 11.1,
+      "url": 28.0,
+      "below_lrl": 782,
+      "above_url": 3016,
+      "in_range": 6202
+    },
+    "epi": {
+      "count": 10000,
+      "min": 0.1086,
+      "max": 10.9908,
+      "mean": 2.764,
+      "median": 2.635,
+      "p5": 0.633,
+      "p25": 1.854,
+      "p75": 3.485,
+      "p95": 5.321,
+      "lrl": 0.76,
+      "url": 4.23,
+      "below_lrl": 647,
+      "above_url": 1265,
+      "in_range": 8088
+    },
+    "vma": {
+      "count": 10000,
+      "min": 0.3,
+      "max": 4.4214,
+      "mean": 1.568,
+      "median": 1.55,
+      "p5": 0.799,
+      "p25": 1.272,
+      "p75": 1.83,
+      "p95": 2.389,
+      "lrl": 1.04,
+      "url": 2.2,
+      "below_lrl": 1194,
+      "above_url": 867,
+      "in_range": 7939
+    },
+    "mhpg": {
+      "count": 10000,
+      "min": 0.15,
+      "max": 2.4153,
+      "mean": 0.827,
+      "median": 0.817,
+      "p5": 0.441,
+      "p25": 0.672,
+      "p75": 0.958,
+      "p95": 1.242,
+      "lrl": 0.52,
+      "url": 1.13,
+      "below_lrl": 956,
+      "above_url": 911,
+      "in_range": 8133
+    },
+    "nor_epi": {
+      "count": 10000,
+      "min": 0.4592,
+      "max": 49.75,
+      "mean": 10.673,
+      "median": 8.962,
+      "p5": 4.393,
+      "p25": 6.621,
+      "p75": 12.456,
+      "p95": 22.456,
+      "lrl": 3,
+      "url": 7,
+      "below_lrl": 64,
+      "above_url": 7080,
+      "in_range": 2856
+    },
+    "hva_vma": {
+      "count": 10000,
+      "min": 0.3502,
+      "max": 7.3281,
+      "mean": 1.575,
+      "median": 1.504,
+      "p5": 0.942,
+      "p25": 1.248,
+      "p75": 1.821,
+      "p95": 2.426,
+      "lrl": 0.23,
+      "url": 2.83,
+      "below_lrl": 0,
+      "above_url": 182,
+      "in_range": 9818
+    },
+    "ser": {
+      "count": 10000,
+      "min": 8.0,
+      "max": 127.4964,
+      "mean": 54.196,
+      "median": 54.593,
+      "p5": 26.989,
+      "p25": 43.993,
+      "p75": 64.322,
+      "p95": 79.777,
+      "lrl": 38,
+      "url": 89,
+      "below_lrl": 1536,
+      "above_url": 174,
+      "in_range": 8290
+    },
+    "hiaa": {
+      "count": 10000,
+      "min": 0.2182,
+      "max": 4.5944,
+      "mean": 1.927,
+      "median": 1.937,
+      "p5": 1.001,
+      "p25": 1.586,
+      "p75": 2.265,
+      "p95": 2.817,
+      "lrl": 1.0,
+      "url": 3.3,
+      "below_lrl": 499,
+      "above_url": 107,
+      "in_range": 9394
+    },
+    "hiaa_ser": {
+      "count": 10000,
+      "min": 0.005,
+      "max": 0.1752,
+      "mean": 0.038,
+      "median": 0.036,
+      "p5": 0.021,
+      "p25": 0.029,
+      "p75": 0.043,
+      "p95": 0.06,
+      "lrl": 0.03,
+      "url": 0.08,
+      "below_lrl": 2752,
+      "above_url": 112,
+      "in_range": 7136
+    },
+    "da_ser": {
+      "count": 10000,
+      "min": 0.443,
+      "max": 13.811,
+      "mean": 3.054,
+      "median": 2.933,
+      "p5": 1.716,
+      "p25": 2.408,
+      "p75": 3.553,
+      "p95": 4.703,
+      "lrl": 1.5,
+      "url": 3.5,
+      "below_lrl": 246,
+      "above_url": 2660,
+      "in_range": 7094
+    },
+    "creatinine": {
+      "count": 9834,
+      "min": 43.4286,
+      "max": 156.0144,
+      "mean": 97.592,
+      "median": 97.752,
+      "p5": 73.538,
+      "p25": 88.116,
+      "p75": 107.2,
+      "p95": 121.417,
+      "lrl": 80,
+      "url": 120,
+      "below_lrl": 1121,
+      "above_url": 591,
+      "in_range": 8122
+    }
+  },
+  "phase_counts": {
+    "1": 932,
+    "2": 838,
+    "3": 533,
+    "4": 4710,
+    "5": 251,
+    "6": 2736
+  },
+  "phenotype_counts": {
+    "Healthy": 2234,
+    "AcuteStress": 1997,
+    "EarlyBurnout": 1817,
+    "Burnout": 1794,
+    "Exhaustion": 991,
+    "SympatheticDominance": 689,
+    "AdrenalFatigue": 478
+  },
+  "trajectory_counts": {
+    "stable": 4228,
+    "recovery": 3902,
+    "decline": 1870
+  },
+  "phenotype_x_tier": {
+    "Burnout": {
+      "T2": 480,
+      "T3": 291,
+      "T1": 980,
+      "T4": 43
+    },
+    "EarlyBurnout": {
+      "T1": 1259,
+      "T3": 437,
+      "T2": 121
+    },
+    "Exhaustion": {
+      "T2": 254,
+      "T4": 341,
+      "T3": 140,
+      "T1": 256
+    },
+    "Healthy": {
+      "T1": 2084,
+      "T3": 139,
+      "T2": 11
+    },
+    "SympatheticDominance": {
+      "T1": 481,
+      "T2": 86,
+      "T3": 117,
+      "T4": 5
+    },
+    "AcuteStress": {
+      "T3": 984,
+      "T1": 996,
+      "T2": 17
+    },
+    "AdrenalFatigue": {
+      "T4": 378,
+      "T2": 55,
+      "T3": 18,
+      "T1": 27
+    }
+  },
+  "trajectory_x_tier": {
+    "stable": {
+      "T2": 399,
+      "T3": 1113,
+      "T1": 2303,
+      "T4": 413
+    },
+    "recovery": {
+      "T1": 3032,
+      "T2": 268,
+      "T3": 515,
+      "T4": 87
+    },
+    "decline": {
+      "T4": 267,
+      "T3": 498,
+      "T1": 748,
+      "T2": 357
+    }
+  },
+  "trajectory_curves": {
+    "stable": [
+      {
+        "month": 0,
+        "score": 13.62,
+        "n": 3082
+      },
+      {
+        "month": 1,
+        "score": 13.76,
+        "n": 2786
+      },
+      {
+        "month": 2,
+        "score": 13.6,
+        "n": 3146
+      },
+      {
+        "month": 3,
+        "score": 13.48,
+        "n": 2792
+      },
+      {
+        "month": 4,
+        "score": 13.38,
+        "n": 3162
+      },
+      {
+        "month": 5,
+        "score": 13.63,
+        "n": 2835
+      },
+      {
+        "month": 6,
+        "score": 13.64,
+        "n": 3046
+      },
+      {
+        "month": 7,
+        "score": 13.24,
+        "n": 2598
+      },
+      {
+        "month": 8,
+        "score": 13.63,
+        "n": 2785
+      },
+      {
+        "month": 9,
+        "score": 13.5,
+        "n": 2275
+      },
+      {
+        "month": 10,
+        "score": 13.49,
+        "n": 2348
+      },
+      {
+        "month": 11,
+        "score": 13.29,
+        "n": 1883
+      },
+      {
+        "month": 12,
+        "score": 15.05,
+        "n": 70
+      }
+    ],
+    "recovery": [
+      {
+        "month": 0,
+        "score": 17.44,
+        "n": 2848
+      },
+      {
+        "month": 1,
+        "score": 16.73,
+        "n": 2539
+      },
+      {
+        "month": 2,
+        "score": 16.77,
+        "n": 2905
+      },
+      {
+        "month": 3,
+        "score": 15.33,
+        "n": 2575
+      },
+      {
+        "month": 4,
+        "score": 14.15,
+        "n": 2874
+      },
+      {
+        "month": 5,
+        "score": 12.51,
+        "n": 2632
+      },
+      {
+        "month": 6,
+        "score": 11.21,
+        "n": 2774
+      },
+      {
+        "month": 7,
+        "score": 9.95,
+        "n": 2388
+      },
+      {
+        "month": 8,
+        "score": 8.55,
+        "n": 2514
+      },
+      {
+        "month": 9,
+        "score": 7.73,
+        "n": 2078
+      },
+      {
+        "month": 10,
+        "score": 7.46,
+        "n": 2146
+      },
+      {
+        "month": 11,
+        "score": 7.44,
+        "n": 1706
+      },
+      {
+        "month": 12,
+        "score": 7.11,
+        "n": 50
+      }
+    ],
+    "decline": [
+      {
+        "month": 0,
+        "score": 14.67,
+        "n": 1350
+      },
+      {
+        "month": 1,
+        "score": 14.62,
+        "n": 1237
+      },
+      {
+        "month": 2,
+        "score": 14.65,
+        "n": 1411
+      },
+      {
+        "month": 3,
+        "score": 14.62,
+        "n": 1217
+      },
+      {
+        "month": 4,
+        "score": 14.76,
+        "n": 1351
+      },
+      {
+        "month": 5,
+        "score": 15.08,
+        "n": 1235
+      },
+      {
+        "month": 6,
+        "score": 15.64,
+        "n": 1304
+      },
+      {
+        "month": 7,
+        "score": 16.15,
+        "n": 1091
+      },
+      {
+        "month": 8,
+        "score": 16.7,
+        "n": 1100
+      },
+      {
+        "month": 9,
+        "score": 17.58,
+        "n": 912
+      },
+      {
+        "month": 10,
+        "score": 18.52,
+        "n": 901
+      },
+      {
+        "month": 11,
+        "score": 18.17,
+        "n": 744
+      },
+      {
+        "month": 12,
+        "score": 17.0,
+        "n": 22
+      }
+    ]
+  },
+  "score_stats": {
+    "mean": 12.19,
+    "median": 9.1,
+    "p25": 4.2,
+    "p75": 15.5
+  },
+  "age_stats": {
+    "mean": 41.9,
+    "median": 41.8,
+    "min": 21.1,
+    "max": 70.5
+  }
+}

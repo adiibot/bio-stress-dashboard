@@ -1,0 +1,31 @@
+# node / next
+node_modules/
+.next/
+out/
+
+# python
+.venv/
+__pycache__/
+*.pyc
+
+# os / editor
+.DS_Store
+*.log
+.env*.local
+
+# nested duplicate at web/analytics-health/ — leftover, do not push
+web/analytics-health/
+
+# excluded from public push (per request)
+*.docx
+PLAN.md
+CLAUDE.md
+parse_docs.py
+profile_data.py
+profile2.py
+
+# the ~48 MB realistic xlsx — too large, not used by the build
+Bio_Stress_Synthetic_Realistic.xlsx
+
+# local claude config
+.claude/
