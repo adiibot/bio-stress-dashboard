@@ -11,8 +11,14 @@ import { DayRhythm } from "@/components/narrative/DayRhythm";
 import { InsightStream } from "@/components/narrative/InsightStream";
 import { NextStep } from "@/components/narrative/NextStep";
 import { PatternsCallout } from "@/components/narrative/PatternsCallout";
+import { ModeToggle, useViewMode } from "@/components/narrative/ModeToggle";
+import { CortisolMetrics } from "@/components/narrative/CortisolMetrics";
+import { BiomarkerConstellation } from "@/components/narrative/BiomarkerConstellation";
+import { MyPosition } from "@/components/narrative/MyPosition";
+import { ActionPlan } from "@/components/narrative/ActionPlan";
+import { Glossary } from "@/components/narrative/Glossary";
 import { BASE_PATH } from "@/lib/base-path";
-import type { PatientRecord } from "@/lib/types";
+import type { CohortAggregate, PatientRecord } from "@/lib/types";
 
 const HERO_TINTS: Record<string, { tint: string; tint2: string }> = {
   T1: { tint: "rgba(16,185,129,0.12)", tint2: "rgba(16,185,129,0.05)" },
@@ -33,25 +39,33 @@ function Loader() {
   const sp = useSearchParams();
   const id = sp.get("id");
   const [p, setP] = useState<PatientRecord | null>(null);
+  const [cohort, setCohort] = useState<CohortAggregate | null>(null);
   const [missing, setMissing] = useState(false);
 
   useEffect(() => {
     setP(null);
     setMissing(false);
     if (!id) return;
-    fetch(`${BASE_PATH}/data/patients/${id}.json`)
-      .then((r) => {
-        if (!r.ok) { setMissing(true); return null; }
-        return r.json() as Promise<PatientRecord>;
+    Promise.all([
+      fetch(`${BASE_PATH}/data/patients/${id}.json`).then((r) =>
+        r.ok ? (r.json() as Promise<PatientRecord>) : null,
+      ),
+      fetch(`${BASE_PATH}/data/cohort.json`).then((r) =>
+        r.ok ? (r.json() as Promise<CohortAggregate>) : null,
+      ),
+    ])
+      .then(([patient, c]) => {
+        if (!patient) { setMissing(true); return; }
+        setP(patient);
+        if (c) setCohort(c);
       })
-      .then((d) => { if (d) setP(d); })
       .catch(() => setMissing(true));
   }, [id]);
 
   if (!id) return <Centered>No patient ID provided.</Centered>;
   if (missing) return <Centered>Patient {id} not found.</Centered>;
   if (!p) return <Centered>Loading…</Centered>;
-  return <PatientDeepDive p={p} />;
+  return <PatientDeepDive p={p} cohort={cohort} />;
 }
 
 function Centered({ children }: { children: React.ReactNode }) {
@@ -63,7 +77,10 @@ function Centered({ children }: { children: React.ReactNode }) {
   );
 }
 
-function PatientDeepDive({ p }: { p: PatientRecord }) {
+function PatientDeepDive({ p, cohort }: { p: PatientRecord; cohort: CohortAggregate | null }) {
+  const [mode, setMode] = useViewMode();
+  const advanced = mode === "advanced";
+
   const visit = p.latest_visit;
   const r = visit.result;
   const tier = r.tier_final;
@@ -75,6 +92,11 @@ function PatientDeepDive({ p }: { p: PatientRecord }) {
 
   return (
     <PatientShell heroBg={HERO_TINTS[tier]}>
+      {/* mode toggle floats top-right */}
+      <div className="flex justify-end pt-2 mb-3">
+        <ModeToggle mode={mode} onChange={setMode} />
+      </div>
+
       <Hero score={score} tier={tier} />
 
       <Section eyebrow="Your journey" title="Where you are." delayClass="rise-2">
@@ -110,6 +132,28 @@ function PatientDeepDive({ p }: { p: PatientRecord }) {
         />
       </Section>
 
+      {advanced && (
+        <Section
+          eyebrow="Your cortisol metrics"
+          title="The four numbers behind that curve."
+          delayClass="rise-4"
+        >
+          <p className="text-ink-700 text-base leading-relaxed max-w-xl mb-5">
+            We extract four named metrics from your five timepoints. Each one tells
+            a different story about how your cortisol axis is functioning.
+          </p>
+          <CortisolMetrics
+            values={{
+              car_pct: m.car_pct,
+              aucg: m.aucg,
+              dcs: m.dcs,
+              m3: m.m3,
+              m1: m.m1,
+            }}
+          />
+        </Section>
+      )}
+
       <Section
         eyebrow="What we noticed"
         title="The signals worth flagging."
@@ -136,6 +180,47 @@ function PatientDeepDive({ p }: { p: PatientRecord }) {
         </Section>
       )}
 
+      {advanced && (
+        <Section
+          eyebrow="Your full panel"
+          title="Every marker we measured."
+          delayClass="rise-5"
+        >
+          <p className="text-ink-700 text-base leading-relaxed max-w-xl mb-5">
+            Grouped by biological system. Each row shows your value, the healthy
+            reference window, and where you sit relative to our cohort.
+          </p>
+          <BiomarkerConstellation
+            values={m as any}
+            percentiles={p.percentiles}
+          />
+        </Section>
+      )}
+
+      {advanced && cohort && (
+        <Section
+          eyebrow="You in the cohort"
+          title="People with biology like yours."
+          delayClass="rise-6"
+        >
+          <p className="text-ink-700 text-base leading-relaxed max-w-xl mb-5">
+            We map every patient onto a 2D space using their full biomarker profile.
+            Your position relative to others tells you which patterns are most
+            similar to yours.
+          </p>
+          <MyPosition
+            embedding={cohort.embedding}
+            patient={{
+              x: p.embedding.x,
+              y: p.embedding.y,
+              id: p.id,
+              tier,
+              trajectory: p.trajectory,
+            }}
+          />
+        </Section>
+      )}
+
       <Section
         eyebrow="What's next"
         title="Your direction of travel."
@@ -143,6 +228,26 @@ function PatientDeepDive({ p }: { p: PatientRecord }) {
       >
         <NextStep phase={r.suggested_phase} rationale={r.phase_rationale} />
       </Section>
+
+      {advanced && (
+        <Section
+          eyebrow="Your action plan"
+          title="Practical anchors, evidence-based."
+          delayClass="rise-6"
+        >
+          <p className="text-ink-700 text-base leading-relaxed max-w-xl mb-5">
+            These are lifestyle-grade actions tailored to your phase and the patterns
+            we recognised in your panel. Start with one or two, not all at once.
+          </p>
+          <ActionPlan phase={r.suggested_phase} patterns={p.patterns} />
+        </Section>
+      )}
+
+      {advanced && (
+        <div className="rise rise-6 mt-16">
+          <Glossary />
+        </div>
+      )}
 
       <footer className="mt-20 pt-10 border-t border-ink-100 text-xs text-ink-500 leading-relaxed max-w-2xl">
         BIO_STRESS_SCORE is a clinical-grade biological stress dysregulation index — it

@@ -19,7 +19,10 @@ v2.9.1 methodology, applied to a 10,000-patient synthetic cohort.
 │   ├── components/            #   AppShell, ScoreGauge, AxisBars, CortisolCurve …
 │   ├── lib/                   #   types + server-side data loaders
 │   └── public/data/           #   cohort.json + patients-index.json + 10k per-patient files
-└── Bio_Stress_Synthetic_10k.xlsx   # synthetic 10k-patient cohort (input to pipeline)
+├── BIO_STRESS_SCORE_Methodology_v2_8_20260305.docx
+├── Bio_Stress_Synthetic_10k.xlsx
+├── Sorcova_DS_Guide_PAP_v2_0_20260308.docx
+└── PLAN.md                    # full design doc — read first if resuming cold
 ```
 
 ## Running the dashboard
@@ -33,14 +36,10 @@ npm run dev          # http://localhost:3000
 Pages:
 - `/` — landing
 - `/doctor` — clinician cohort overview + patient roster (filter by tier, sex, rule, search)
-- `/doctor/p?id=<userID>` — clinician deep-dive (full transparency, every sub-penalty, all rule triggers, raw biomarker tables with reference bands)
+- `/doctor/<userID>` — clinician deep-dive (full transparency, every sub-penalty, all rule triggers, raw biomarker tables with reference bands)
 - `/patient` — sample patients across tiers
-- `/patient/p?id=<userID>` — patient self-view (tier-coherent score per DISPLAY-1, plain-language insights only)
+- `/patient/<userID>` — patient self-view (tier-coherent score per DISPLAY-1, plain-language insights only)
 - `/analytics` — cohort analytics (tier × age, floor-rule co-occurrence, biomarker distributions, phase distribution)
-
-## Deployment
-
-The site is a static export — `npm run build` writes `web/out/` which can be served by any static host. The included GitHub Actions workflow (`.github/workflows/deploy.yml`) builds and publishes to GitHub Pages on every push to `main`.
 
 ## Re-running the analytics layer
 

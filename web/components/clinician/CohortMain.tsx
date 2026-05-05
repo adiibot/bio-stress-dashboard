@@ -269,10 +269,13 @@ export function CohortMain({ cohort }: { cohort: CohortAggregate }) {
         </Block>
       </div>
 
+      {/* Engine vs ground truth */}
       <AgreementMatrix agreement={cohort.agreement} />
 
+      {/* Cluster embedding */}
       <ClusterEmbedding embedding={cohort.embedding} />
 
+      {/* Pattern recognition layer */}
       <section className="rise rise-5 mt-10">
         <div className="text-[10px] uppercase tracking-[0.2em] text-ink-500 mb-2">
           Pattern recognition
@@ -281,7 +284,7 @@ export function CohortMain({ cohort }: { cohort: CohortAggregate }) {
           Beyond the linear composite.
         </h2>
         <p className="text-ink-500 text-sm mb-5 max-w-2xl">
-          Multi-marker constellations the score itself doesn&apos;t capture as a single penalty.
+          Multi-marker constellations the score itself doesn't capture as a single penalty.
           Detected per latest visit; informational only — they never alter the score or tier.
         </p>
         <div className="rounded-2xl bg-white border border-ink-100 p-5">

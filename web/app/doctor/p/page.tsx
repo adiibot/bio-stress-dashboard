@@ -396,19 +396,19 @@ function ClinicianDeepDive({ p, cohort }: { p: PatientRecord; cohort: CohortAggr
           <div className="text-[10px] uppercase tracking-[0.2em] text-ink-500 mb-2">
             Phenotype context · synthetic ground truth
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <div className="text-[10px] text-ink-500 uppercase tracking-wider mb-1">
-                Baseline
+          {targetPheno && targetPheno !== baselinePheno ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <div className="text-[10px] text-ink-500 uppercase tracking-wider mb-1">
+                  Baseline
+                </div>
+                <div className="font-medium" style={{ color: PHENOTYPE_COLOR[baselinePheno] }}>
+                  {baselinePheno}
+                </div>
+                <p className="text-sm text-ink-600 mt-1 leading-relaxed">
+                  {PHENOTYPE_DESCRIPTION[baselinePheno]}
+                </p>
               </div>
-              <div className="font-medium" style={{ color: PHENOTYPE_COLOR[baselinePheno] }}>
-                {baselinePheno}
-              </div>
-              <p className="text-sm text-ink-600 mt-1 leading-relaxed">
-                {PHENOTYPE_DESCRIPTION[baselinePheno]}
-              </p>
-            </div>
-            {targetPheno && (
               <div>
                 <div className="text-[10px] text-ink-500 uppercase tracking-wider mb-1">
                   Target ({p.trajectory})
@@ -420,8 +420,26 @@ function ClinicianDeepDive({ p, cohort }: { p: PatientRecord; cohort: CohortAggr
                   {PHENOTYPE_DESCRIPTION[targetPheno]}
                 </p>
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div>
+              <div className="font-medium" style={{ color: PHENOTYPE_COLOR[baselinePheno] }}>
+                {baselinePheno}
+              </div>
+              <p className="text-sm text-ink-600 mt-1 leading-relaxed max-w-2xl">
+                {PHENOTYPE_DESCRIPTION[baselinePheno]}
+              </p>
+              {p.trajectory && p.trajectory !== "stable" && (
+                <p className="text-[11px] text-ink-500 mt-3 italic max-w-2xl">
+                  Trajectory tagged <span className="num">{p.trajectory}</span> with no phenotype
+                  movement — the patient is{" "}
+                  {p.trajectory === "decline"
+                    ? "already at the most severe phenotype in the lattice; further worsening shows as within-phenotype intensification rather than transition to a worse label"
+                    : "already at Healthy; further improvement shows as within-phenotype consolidation"}.
+                </p>
+              )}
+            </div>
+          )}
         </section>
       )}
 
