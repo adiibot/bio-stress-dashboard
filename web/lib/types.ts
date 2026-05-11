@@ -203,6 +203,11 @@ export interface CohortAggregate {
   trajectory_x_tier: Record<string, Record<Tier, number>>;
   trajectory_curves: Record<string, { month: number; score: number; n: number }[]>;
   pattern_prevalence: Record<string, number>;
+  axis_tone_counts: {
+    hpa: Record<AxisTone, number>;
+    adrenal: Record<AxisTone, number>;
+    nt: Record<AxisTone, number>;
+  };
   agreement: {
     expected_tier: Record<string, number>;
     matrix: Record<string, Record<Tier, number>>;
@@ -280,6 +285,33 @@ export const TRAJECTORY_COLOR: Record<Trajectory, string> = {
   stable: "#71717a",
   recovery: "#10b981",
   decline: "#e11d48",
+};
+
+// Per-axis severity tone — used wherever an axis raw score (0–100) is rendered.
+// Aligned with composite tier breakpoints (15 / 26 / 33) for visual consistency
+// across composite vs axis. Naming uses tone words rather than T1–T4 because
+// axis scores have different clinical meaning than the composite tier.
+export type AxisTone = "calm" | "stirring" | "loud" | "exhausted";
+
+export const AXIS_TONE_COLOR: Record<AxisTone, string> = {
+  calm: "#10b981",
+  stirring: "#f59e0b",
+  loud: "#f97316",
+  exhausted: "#e11d48",
+};
+
+export function axisTone(value: number): AxisTone {
+  if (value < 16) return "calm";
+  if (value < 26) return "stirring";
+  if (value < 33) return "loud";
+  return "exhausted";
+}
+
+export const AXIS_TONE_VERB: Record<AxisTone, string> = {
+  calm: "balanced",
+  stirring: "under load",
+  loud: "strained",
+  exhausted: "exhausted",
 };
 
 export const PHASE_LABEL: Record<number, string> = {

@@ -527,6 +527,26 @@
     "DHEA_REACTIVE_BUFFER": 19,
     "BIPHASIC_CORTISOL": 13
   },
+  "axis_tone_counts": {
+    "hpa": {
+      "calm": 8562,
+      "stirring": 604,
+      "loud": 179,
+      "exhausted": 655
+    },
+    "adrenal": {
+      "calm": 2848,
+      "stirring": 1792,
+      "loud": 984,
+      "exhausted": 4376
+    },
+    "nt": {
+      "calm": 8518,
+      "stirring": 831,
+      "loud": 248,
+      "exhausted": 403
+    }
+  },
   "agreement": {
     "expected_tier": {
       "Healthy": 1,

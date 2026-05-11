@@ -301,6 +301,17 @@ def main():
     tier_x_sex = defaultdict(lambda: Counter())
     tier_x_age = defaultdict(lambda: Counter())
     score_hist = Counter()
+    # per-axis severity-tone distribution (calm / stirring / loud / exhausted)
+    axis_tone_counts = {
+        "hpa": Counter(),
+        "adrenal": Counter(),
+        "nt": Counter(),
+    }
+    def _tone(v: float) -> str:
+        if v < 16: return "calm"
+        if v < 26: return "stirring"
+        if v < 33: return "loud"
+        return "exhausted"
     rule_prev = Counter()
     flag_prev = Counter()
     rule_pairs = Counter()
@@ -333,6 +344,9 @@ def main():
         tier_x_sex[tier][p["sex"] or "?"] += 1
         tier_x_age[tier][age_band(p["age"])] += 1
         score_hist[int(result["score_formula"] // 5 * 5)] += 1
+        axis_tone_counts["hpa"][_tone(result["hpa_score"])] += 1
+        axis_tone_counts["adrenal"][_tone(result["adrenal_score"])] += 1
+        axis_tone_counts["nt"][_tone(result["nt_score"])] += 1
 
         rules = sorted(set(result["applied_rules"]))
         for r in rules:
@@ -651,6 +665,10 @@ def main():
         "biomarker_summary": biomarker_summary,
         "phase_counts": dict(sorted(phase_counts.items())),
         "pattern_prevalence": dict(pattern_prev.most_common()),
+        "axis_tone_counts": {
+            k: {tone: c.get(tone, 0) for tone in ["calm", "stirring", "loud", "exhausted"]}
+            for k, c in axis_tone_counts.items()
+        },
         "agreement": {
             "expected_tier": EXPECTED_TIER,
             "matrix": agreement_matrix,

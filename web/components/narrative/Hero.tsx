@@ -1,4 +1,5 @@
 import { AnimatedNumber } from "../AnimatedNumber";
+import { AxisScoreTrio } from "../AxisScoreTrio";
 import { TIER_COLOR, TIER_LABEL, type Tier } from "@/lib/types";
 
 const COPY: Record<Tier, { headline: string; sub: string }> = {
@@ -20,7 +21,15 @@ const COPY: Record<Tier, { headline: string; sub: string }> = {
   },
 };
 
-export function Hero({ score, tier }: { score: number; tier: Tier }) {
+export function Hero({
+  score,
+  tier,
+  axes,
+}: {
+  score: number;
+  tier: Tier;
+  axes?: { hpa: number; adrenal: number; nt: number };
+}) {
   const color = TIER_COLOR[tier];
   const copy = COPY[tier];
   const scorePct = Math.max(0, Math.min(100, score));
@@ -73,6 +82,16 @@ export function Hero({ score, tier }: { score: number; tier: Tier }) {
           <span>100</span>
         </div>
       </div>
+
+      {/* per-axis breakdown — the multi-axis hierarchical reporting (P28) */}
+      {axes && (
+        <div className="mt-10 max-w-2xl">
+          <div className="text-[10px] uppercase tracking-[0.18em] text-ink-500 mb-3">
+            Where the load is — by system
+          </div>
+          <AxisScoreTrio values={axes} variant="patient" />
+        </div>
+      )}
     </section>
   );
 }

@@ -17,6 +17,7 @@ import { BiomarkerConstellation } from "@/components/narrative/BiomarkerConstell
 import { MyPosition } from "@/components/narrative/MyPosition";
 import { ActionPlan } from "@/components/narrative/ActionPlan";
 import { Glossary } from "@/components/narrative/Glossary";
+import { TrajectoryChart } from "@/components/TrajectoryChart";
 import { BASE_PATH } from "@/lib/base-path";
 import type { CohortAggregate, PatientRecord } from "@/lib/types";
 
@@ -68,6 +69,18 @@ function Loader() {
   return <PatientDeepDive p={p} cohort={cohort} />;
 }
 
+function Legend({ color, label, solid = false }: { color: string; label: string; solid?: boolean }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span
+        className="block w-4 h-0.5"
+        style={{ background: solid ? color : undefined, borderTop: solid ? "none" : `1.5px dashed ${color}` }}
+      />
+      <span className="text-ink-600">{label}</span>
+    </div>
+  );
+}
+
 function Centered({ children }: { children: React.ReactNode }) {
   return (
     <div className="px-6 py-12 text-sm text-ink-500">
@@ -97,7 +110,15 @@ function PatientDeepDive({ p, cohort }: { p: PatientRecord; cohort: CohortAggreg
         <ModeToggle mode={mode} onChange={setMode} />
       </div>
 
-      <Hero score={score} tier={tier} />
+      <Hero
+        score={score}
+        tier={tier}
+        axes={{
+          hpa: r.hpa_score,
+          adrenal: r.adrenal_score,
+          nt: r.nt_score,
+        }}
+      />
 
       <Section eyebrow="Your journey" title="Where you are." delayClass="rise-2">
         <JourneySection
@@ -177,6 +198,28 @@ function PatientDeepDive({ p, cohort }: { p: PatientRecord; cohort: CohortAggreg
             markers — recognised pictures of how stress biology behaves.
           </p>
           <PatternsCallout patterns={p.patterns} />
+        </Section>
+      )}
+
+      {advanced && p.trajectory_data.length > 1 && (
+        <Section
+          eyebrow="Each system over time"
+          title="Three trajectories, one journey."
+          delayClass="rise-5"
+        >
+          <p className="text-ink-700 text-base leading-relaxed max-w-xl mb-5">
+            The composite score (in dark) summarises everything. The dashed lines
+            underneath show each system separately — when one of them moves
+            independently, that's a clue about what changed and why.
+          </p>
+          <div className="rounded-2xl bg-white border border-ink-100 p-5">
+            <TrajectoryChart data={p.trajectory_data} showAxisLines />
+            <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-ink-100 text-xs">
+              <Legend color="#0f172a" label="Composite" solid />
+              <Legend color="#a78bfa" label="HPA" />
+              <Legend color="#06b6d4" label="NT" />
+            </div>
+          </div>
         </Section>
       )}
 

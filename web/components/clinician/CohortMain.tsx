@@ -13,11 +13,13 @@ import {
   ReferenceArea,
 } from "recharts";
 import {
+  AXIS_TONE_COLOR,
   PHENOTYPE_COLOR,
   TIER_COLOR,
   TIER_LABEL,
   TRAJECTORY_COLOR,
   TRAJECTORY_LABEL,
+  type AxisTone,
   type CohortAggregate,
   type Phenotype,
   type Tier,
@@ -268,6 +270,76 @@ export function CohortMain({ cohort }: { cohort: CohortAggregate }) {
           </div>
         </Block>
       </div>
+
+      {/* Per-axis severity distribution — multi-axis hierarchical reporting (P28) */}
+      <section className="rise rise-4 mt-10">
+        <div className="text-[10px] uppercase tracking-[0.2em] text-ink-500 mb-2">
+          By axis · multi-axis hierarchical reporting
+        </div>
+        <h2 className="serif text-2xl text-ink-900 leading-tight mb-1">
+          Which system is driving the load.
+        </h2>
+        <p className="text-ink-500 text-sm mb-5 max-w-2xl">
+          A single composite score averages three biological systems. Splitting them
+          shows where the cohort's stress signal is concentrated — and where the
+          composite hides the asymmetry.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {([
+            { key: "hpa", title: "HPA axis", helper: "cortisol rhythm" },
+            { key: "adrenal", title: "Adrenal reserve", helper: "DHEA + ratio" },
+            { key: "nt", title: "Neurotransmitter", helper: "cat-axis + mon-axis" },
+          ] as const).map((axis) => {
+            const dist = cohort.axis_tone_counts?.[axis.key];
+            if (!dist) return null;
+            const total = (Object.values(dist) as number[]).reduce((a, b) => a + b, 0);
+            return (
+              <div
+                key={axis.key}
+                className="rounded-2xl bg-white border border-ink-100 p-5"
+              >
+                <div className="mb-4">
+                  <div className="text-sm font-semibold text-ink-900">{axis.title}</div>
+                  <div className="text-xs text-ink-500">{axis.helper}</div>
+                </div>
+                {/* stacked bar */}
+                <div className="h-2 rounded-full overflow-hidden flex bg-ink-100 mb-3">
+                  {(["calm", "stirring", "loud", "exhausted"] as AxisTone[]).map((tone) => {
+                    const c = dist[tone] || 0;
+                    const pct = (c / total) * 100;
+                    if (pct === 0) return null;
+                    return (
+                      <div
+                        key={tone}
+                        title={`${tone} · ${c.toLocaleString()} (${pct.toFixed(1)}%)`}
+                        style={{ width: `${pct}%`, background: AXIS_TONE_COLOR[tone] }}
+                      />
+                    );
+                  })}
+                </div>
+                <div className="space-y-1.5">
+                  {(["calm", "stirring", "loud", "exhausted"] as AxisTone[]).map((tone) => {
+                    const c = dist[tone] || 0;
+                    const pct = (c / total) * 100;
+                    return (
+                      <div key={tone} className="flex items-center gap-2 text-xs">
+                        <span
+                          className="w-2 h-2 rounded-full"
+                          style={{ background: AXIS_TONE_COLOR[tone] }}
+                        />
+                        <span className="text-ink-700 capitalize flex-1">{tone}</span>
+                        <span className="num text-ink-500">
+                          {c.toLocaleString()} · {pct.toFixed(1)}%
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       {/* Engine vs ground truth */}
       <AgreementMatrix agreement={cohort.agreement} />
