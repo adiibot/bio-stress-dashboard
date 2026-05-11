@@ -121,6 +121,34 @@ export interface Embedding {
   y: number;
 }
 
+export interface Sensitivity {
+  marker: string;
+  label: string;
+  current: number;
+  d_score: number;
+  abs_importance: number;
+}
+
+export interface Counterfactual {
+  marker: string;
+  label: string;
+  current: number;
+  target_value: number;
+  delta: number;
+  rel_delta_pct: number;
+  direction: "up" | "down";
+  new_score: number;
+  new_tier: Tier;
+}
+
+export interface CounterfactualAnalysis {
+  current_score: number;
+  current_tier: Tier;
+  next_tier_below: Tier | null;
+  sensitivities: Sensitivity[];
+  counterfactuals: Counterfactual[];
+}
+
 export interface PatientRecord {
   id: string;
   lab_id: string | null;
@@ -143,6 +171,7 @@ export interface PatientRecord {
   neighbors: Neighbor[];
   embedding: Embedding;
   expected_tier: Tier | null;
+  counterfactual: CounterfactualAnalysis;
 }
 
 export interface PatientIndexEntry {

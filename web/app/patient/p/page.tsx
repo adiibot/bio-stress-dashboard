@@ -17,6 +17,7 @@ import { BiomarkerConstellation } from "@/components/narrative/BiomarkerConstell
 import { MyPosition } from "@/components/narrative/MyPosition";
 import { ActionPlan } from "@/components/narrative/ActionPlan";
 import { Glossary } from "@/components/narrative/Glossary";
+import { WhatCouldMove } from "@/components/narrative/WhatCouldMove";
 import { TrajectoryChart } from "@/components/TrajectoryChart";
 import { BASE_PATH } from "@/lib/base-path";
 import type { CohortAggregate, PatientRecord } from "@/lib/types";
@@ -271,6 +272,16 @@ function PatientDeepDive({ p, cohort }: { p: PatientRecord; cohort: CohortAggreg
       >
         <NextStep phase={r.suggested_phase} rationale={r.phase_rationale} />
       </Section>
+
+      {advanced && (
+        <Section
+          eyebrow="What could move your number"
+          title="A look at the levers."
+          delayClass="rise-6"
+        >
+          <WhatCouldMove data={p.counterfactual} />
+        </Section>
+      )}
 
       {advanced && (
         <Section

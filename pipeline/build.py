@@ -28,6 +28,7 @@ import pandas as pd
 
 from score_engine import bio_stress_score, result_to_dict, NR
 from pattern_engine import detect_patterns
+from counterfactual import analyze_patient as counterfactual_analyze
 
 
 REPO = Path(__file__).resolve().parent.parent
@@ -636,6 +637,11 @@ def main():
             "score_percentile": score_pct,
             "patterns": pattern_lists[pi],
             "neighbors": neighbors,
+            "counterfactual": counterfactual_analyze(
+                latest["biomarkers"],
+                latest["result"]["score_formula"],
+                latest["result"]["tier_final"],
+            ),
             "embedding": {
                 "x": round(float(coords[pi, 0]), 4),
                 "y": round(float(coords[pi, 1]), 4),

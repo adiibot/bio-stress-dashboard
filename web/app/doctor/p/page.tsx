@@ -7,6 +7,7 @@ import { CortisolCurve } from "@/components/CortisolCurve";
 import { TrajectoryChart } from "@/components/TrajectoryChart";
 import { DeepDiveHero } from "@/components/clinician/DeepDiveHero";
 import { ClusterEmbedding } from "@/components/clinician/ClusterEmbedding";
+import { CounterfactualPanel } from "@/components/clinician/CounterfactualPanel";
 import { NeighborsPanel } from "@/components/clinician/NeighborsPanel";
 import { PatternsPanel } from "@/components/clinician/PatternsPanel";
 import { BASE_PATH } from "@/lib/base-path";
@@ -276,6 +277,10 @@ function ClinicianDeepDive({ p, cohort }: { p: PatientRecord; cohort: CohortAggr
       <div className="rise rise-4 grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-5 mt-5">
         <PatternsPanel patterns={p.patterns} />
         <NeighborsPanel neighbors={p.neighbors} />
+      </div>
+
+      <div className="rise rise-4 mt-5">
+        <CounterfactualPanel data={p.counterfactual} />
       </div>
 
       <ClusterEmbedding
