@@ -7,6 +7,7 @@ import { CortisolCurve } from "@/components/CortisolCurve";
 import { TrajectoryChart } from "@/components/TrajectoryChart";
 import { DeepDiveHero } from "@/components/clinician/DeepDiveHero";
 import { ClusterEmbedding } from "@/components/clinician/ClusterEmbedding";
+import { useCompareSet } from "@/components/clinician/CompareBar";
 import { CounterfactualPanel } from "@/components/clinician/CounterfactualPanel";
 import { NeighborsPanel } from "@/components/clinician/NeighborsPanel";
 import { PatternsPanel } from "@/components/clinician/PatternsPanel";
@@ -111,6 +112,8 @@ function Centered({ children }: { children: React.ReactNode }) {
 }
 
 function ClinicianDeepDive({ p, cohort }: { p: PatientRecord; cohort: CohortAggregate }) {
+  const [compareIds, toggleCompare] = useCompareSet();
+  const inCompare = compareIds.includes(p.id);
   const visit = p.latest_visit;
   const r = visit.result;
   const m = visit.biomarkers;
@@ -146,9 +149,21 @@ function ClinicianDeepDive({ p, cohort }: { p: PatientRecord; cohort: CohortAggr
         <Link href="/doctor" className="hover:text-ink-700 transition">
           ← cohort
         </Link>
-        <Link href={`/patient/p?id=${p.id}`} className="hover:text-ink-700 transition">
-          patient view →
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => toggleCompare(p.id)}
+            className={`px-2.5 py-1 rounded-md text-[11px] font-medium border transition ${
+              inCompare
+                ? "bg-ink-900 text-white border-ink-900"
+                : "bg-white text-ink-600 border-ink-200 hover:border-ink-900 hover:text-ink-900"
+            }`}
+          >
+            {inCompare ? "✓ in compare" : "+ add to compare"}
+          </button>
+          <Link href={`/patient/p?id=${p.id}`} className="hover:text-ink-700 transition">
+            patient view →
+          </Link>
+        </div>
       </div>
 
       <DeepDiveHero p={p} />

@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useMemo, useState, useEffect, useRef } from "react";
+import { useCompareSet } from "./CompareBar";
 import {
   PHENOTYPE_COLOR,
   TIER_COLOR,
@@ -159,17 +160,48 @@ export function RosterSidebar({
 }
 
 function PatientRow({ p, active }: { p: PatientIndexEntry; active: boolean }) {
+  const [compareIds, toggleCompare] = useCompareSet();
+  const inCompare = compareIds.includes(p.id);
+  return <PatientRowInner p={p} active={active} inCompare={inCompare} onToggleCompare={() => toggleCompare(p.id)} />;
+}
+
+function PatientRowInner({
+  p, active, inCompare, onToggleCompare,
+}: {
+  p: PatientIndexEntry;
+  active: boolean;
+  inCompare: boolean;
+  onToggleCompare: () => void;
+}) {
   const tierColor = TIER_COLOR[p.tier];
   const trajColor = p.trajectory ? TRAJECTORY_COLOR[p.trajectory as Trajectory] : "#a1a1aa";
   const phenoColor = p.phenotype ? PHENOTYPE_COLOR[p.phenotype as Phenotype] : "#a1a1aa";
   return (
-    <Link
-      href={`/doctor/p?id=${p.id}`}
-      data-pid={p.id}
-      className={`block px-3 py-2 transition group ${
+    <div
+      className={`block px-3 py-2 transition group relative ${
         active ? "bg-ink-50" : "hover:bg-ink-50/60"
       }`}
     >
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onToggleCompare();
+        }}
+        aria-label={inCompare ? "Remove from compare" : "Add to compare"}
+        className={`absolute top-1/2 -translate-y-1/2 right-2 w-5 h-5 rounded border text-[12px] leading-none transition opacity-0 group-hover:opacity-100 ${
+          inCompare
+            ? "bg-ink-900 text-white border-ink-900 opacity-100"
+            : "border-ink-300 text-ink-500 bg-white hover:border-ink-900 hover:text-ink-900"
+        }`}
+      >
+        {inCompare ? "✓" : "+"}
+      </button>
+      <Link
+        href={`/doctor/p?id=${p.id}`}
+        data-pid={p.id}
+        className="block pr-7"
+      >
       <div className="flex items-center gap-2">
         <span
           className="w-1 h-9 rounded-full shrink-0"
@@ -207,7 +239,8 @@ function PatientRow({ p, active }: { p: PatientIndexEntry; active: boolean }) {
           </div>
         </div>
       </div>
-    </Link>
+      </Link>
+    </div>
   );
 }
 

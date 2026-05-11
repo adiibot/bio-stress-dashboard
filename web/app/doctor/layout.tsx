@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { ClinicianTopBar } from "@/components/clinician/ClinicianTopBar";
+import { CompareBar } from "@/components/clinician/CompareBar";
 import { RosterSidebar } from "@/components/clinician/RosterSidebar";
 import { getCohort, getIndex } from "@/lib/data";
 
@@ -29,6 +30,7 @@ export default async function DoctorLayout({
         </Suspense>
         <div className="min-w-0">{children}</div>
       </div>
+      <CompareBar />
     </div>
   );
 }
